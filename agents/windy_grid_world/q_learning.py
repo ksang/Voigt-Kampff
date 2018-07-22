@@ -85,6 +85,30 @@ def q_learning(env, num_episodes, start_idx, stats, discount_factor=1.0, alpha=0
 
     return Q
 
+def gen_episode(env, Q):
+    """
+    Generates episode experience [(state, reward, action)] from Q function
+
+    Args:
+        env: OpenAI environment.
+        Q: action-value function, a dictionary mapping state -> action values.
+
+    Returns:
+        episode: experience under Q, a list of (state, reward, action)
+    """
+    state = env.reset()
+    action = np.argmax(Q[state])
+    reward = 0
+    episode = [(state, reward, action)]
+    for t in itertools.count():
+        state, reward, done, _ = env.step(action)
+        action = np.argmax(Q[state])
+        if done:
+            episode.append((state, reward, -1))
+            break
+        episode.append((state, reward, action))
+    return episode
+
 # Keeps track of useful statistics
 stats = plotting.EpisodeStats(
     episode_lengths=np.zeros(1000),
@@ -93,6 +117,9 @@ stats = plotting.EpisodeStats(
 Q = q_learning(env, 500, 0, stats)
 print("Before change:")
 print(Q)
+
+episode = gen_episode(env, Q)
+env.render_episode(episode)
 new_shape = (8, 8)
 w = np.zeros(new_shape)
 w[:,[3,4]] = 1
@@ -103,4 +130,8 @@ env.change(new_shape, w, (5,5))
 Q = q_learning(env, 500, 500, stats)
 print("After change:")
 print(Q)
+episode = gen_episode(env, Q)
+env.render_episode(episode)
+
+# plot statistics
 plotting.plot_episode_stats(stats)

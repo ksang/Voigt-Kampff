@@ -88,3 +88,48 @@ class WindyGridworldEnv(discrete.DiscreteEnv):
 
             outfile.write(output)
         outfile.write("\n")
+
+    def render_episode(self, episode, mode='human', close=False):
+        """
+        episde is a list of tuple (state, reward, action)
+
+        """
+        if close:
+            return
+        state_action = {}
+        outfile = StringIO() if mode == 'ansi' else sys.stdout
+        total_reward = 0
+        for state, reward, action in episode:
+            print("state: %s\treward: %s\taction: %s" % (state, reward, action))
+            state_action[state] = action
+            total_reward += reward
+        print("total reward: %s" % total_reward)
+
+        for s in range(self.nS):
+            position = np.unravel_index(s, self.shape)
+            # print(self.s)
+            if s in state_action:
+                action = state_action[s]
+                if action == 0:
+                    output = " U "
+                elif action == 1:
+                    output = " R "
+                elif action == 2:
+                    output = " D "
+                elif action == 3:
+                    output = " L "
+                else:
+                    output = " T "
+            elif position == self.terminate:
+                output = " T "
+            else:
+                output = " o "
+
+            if position[1] == 0:
+                output = output.lstrip()
+            if position[1] == self.shape[1] - 1:
+                output = output.rstrip()
+                output += "\n"
+
+            outfile.write(output)
+        outfile.write("\n")

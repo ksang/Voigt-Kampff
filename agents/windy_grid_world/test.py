@@ -10,28 +10,25 @@ sys.path.append(
 from envs.grid_world import WindyGridworldEnv
 
 env = WindyGridworldEnv()
+episode = []
+actions = [1, 2, 3, 0]
 
-print(env.reset())
-env.render()
+state = env.reset()
+reward = 0
+for a in actions:
+    episode.append((state, reward, a))
+    env.render()
+    state, reward, _, _ = env.step(a)
 
-print(env.step(1))
-env.render()
-
-print(env.step(2))
-env.render()
-
-print(env.step(3))
-env.render()
-
-print(env.step(0))
-env.render()
+episode.append((state, reward, a))
+env.render_episode(episode)
 
 new_shape = (8, 8)
 w = np.zeros(new_shape)
 w[:,[3,4]] = 1
 w[:,[6,7]] = 3
 
-print("changing")
+print("change env:")
 env.change(new_shape, w, (5,5))
 
 print(env.step(0))
