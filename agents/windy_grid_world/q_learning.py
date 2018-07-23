@@ -125,7 +125,7 @@ w = np.zeros(new_shape)
 w[:,[3,4]] = 1
 w[:,[6,7]] = 3
 
-print("changing")
+print("changing env")
 env.change(new_shape, w, (5,5))
 Q = q_learning(env, 500, 500, stats)
 print("After change:")

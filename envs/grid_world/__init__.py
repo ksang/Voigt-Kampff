@@ -1,1 +1,1 @@
-from windy import WindyGridworldEnv
+from .windy import WindyGridworldEnv
