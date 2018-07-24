@@ -102,4 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# misc
 .tags*
+.DS_Store
+.ipynb_checkpoints

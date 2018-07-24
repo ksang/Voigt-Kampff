@@ -1,0 +1,75 @@
+Reinforcement Learning in a nutshell
+
+12 Aug 2017
+Tags: RL
+
+Ying
+
+
+* Introduction
+
+*Problem:*
+
+- To capture the most important aspects of the real problem facing a learning agent interacting over time with its environment to achieve a goal.
+
+*Descriptions:*
+
+- Reinforcement learning is learning what to do - how to map situations to actions, so as to maximize a numerical reward signal.
+- The learner is not told which actions to take, but instead must discover which actions yield the most reward by trying them.
+- Reinforcement learning explicitly considers the whole problem of a goal-directed agent interacting with an uncertain environment.
+
+* Agent and Environment
+
+.image img/agent_env.png 350 _
+
+- Agent interacts with its environment in discrete time steps.
+- At a time step, agent receives observation which typically includes the reward, then it choose an action and subsequently sent to the environment.
+- Then environment emits new observation and reward of next time step.
+
+* Policy and Value Function
+
+*Policy*
+
+- A policy is the agent’s behaviour, it is a map from state to action.
+
+.image img/policy.png 40 _
+
+*Value*Function*
+
+- Value function is a prediction of future reward.
+- It is used to evaluate the goodness/badness of states.
+- And therefore to select between actions.
+
+.image img/value_function.png 50 _
+
+* Markov Decision Process
+
+.image img/mdp.png 360 _
+
+- Markov property: "The future is independent of the past given the present".
+- Markov decision processes formally describe an environment for reinforcement learning.
+
+* Fundamental Solutions
+
+*Dynamic*Programming*
+
+- Learn MDP at full width, trying each subsequence action and state, in brute-force manner.
+- Requires full knowledge of model.
+
+*Monte-Carlo*
+
+- Learn directly from complete episodes of experience, in other words, complete sampling.
+- Model-free: no knowledge of MDP transitions / rewards
+
+*Temporal-Difference*
+
+- Learn from incomplete episodes of experience, also model-free.
+- Update guess towards a guess from each step of episode.
+
+* Demo: Mountain Car
+
+.video video/mountaincar.mp4 video/mp4 380 _
+
+- *State*space:* all positions on the continuous curve.
+- *Action*space:* left accelerate, stay, right accelerate.
+- *Reward:* each step get -1.0 until reaches the flag, up limit is 200 steps.
