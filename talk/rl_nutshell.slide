@@ -70,6 +70,14 @@ Ying
 
 .video video/mountaincar.mp4 video/mp4 380 _
 
-- *State*space:* position on the continuous curve and car's velocity.
-- *Action*space:* left accelerate, stay, right accelerate.
+- *State*space:* position on the curve and car's velocity.
+- *Action*space:* nope, left/right accelerate.
 - *Reward:* each step get -1.0 until reaches the flag, up limit is 200 steps.
+
+* Demo: Atari Pooyan
+
+.video video/pooyan.mp4 video/mp4 380 _
+
+- *State*space:* RGB board pixel values.
+- *Action*space:* nope, move up/down, shoot arrow, throw a slab of meat.
+- *Reward:* score.

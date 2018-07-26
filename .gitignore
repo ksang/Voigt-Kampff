@@ -107,3 +107,4 @@ venv.bak/
 .tags*
 .DS_Store
 .ipynb_checkpoints
+experiments
