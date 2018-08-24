@@ -81,3 +81,10 @@ Ying
 - *State*space:* RGB board pixel values.
 - *Action*space:* nope, move up/down, shoot arrow, throw a slab of meat.
 - *Reward:* score.
+
+* Demo: Atari Pooyan Trained
+
+.video video/pooyan_trained.mp4 video/mp4 380 _
+- Trained with Deep Q Network.
+- 16 core CPU, 10 days, 10000 iterations.
+- Score improved from 415 to 2065.
