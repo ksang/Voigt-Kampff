@@ -4,6 +4,8 @@ import matplotlib
 import numpy as np
 import pandas as pd
 import sys,os
+import logging
+import argparse
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -17,7 +19,9 @@ from libs import plotting
 
 matplotlib.style.use('ggplot')
 
-env = WindyGridworldEnv()
+FORMAT = '%(asctime)-15s %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger('q_learning')
 
 def make_epsilon_greedy_policy(Q, epsilon, nA):
     """
@@ -68,7 +72,9 @@ def q_learning(env, num_episodes, start_idx, stats, discount_factor=1.0, alpha=0
 
     for i_episode in range(num_episodes):
         state = env.reset()
-        for t in range(1000):
+        if i_episode % 20 == 0:
+            logger.warning('Episode %d', i_episode)
+        for t in range(2000):
             action_probs = policy(state)
             action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             next_state, reward, done, _ = env.step(action)
@@ -109,29 +115,36 @@ def gen_episode(env, Q):
         episode.append((state, reward, action))
     return episode
 
-# Keeps track of useful statistics
-stats = plotting.EpisodeStats(
-    episode_lengths=np.zeros(1000),
-    episode_rewards=np.zeros(1000))
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-x', type=int, default=7)
+    parser.add_argument('-y', type=int, default=10)
+    args = parser.parse_args()
 
-Q = q_learning(env, 500, 0, stats)
-print("Before change:")
-print(Q)
+    env = WindyGridworldEnv(shape=(args.x, args.y), terminate=(args.x-3, args.y-1))
+    # Keeps track of useful statistics
+    stats = plotting.EpisodeStats(
+        episode_lengths=np.zeros(500),
+        episode_rewards=np.zeros(500))
 
-episode = gen_episode(env, Q)
-env.render_episode(episode)
-new_shape = (8, 8)
-w = np.zeros(new_shape)
-w[:,[3,4]] = 1
-w[:,[6,7]] = 3
+    Q = q_learning(env, 500, 0, stats)
 
-print("changing env")
-env.change(new_shape, w, (5,5))
-Q = q_learning(env, 500, 500, stats)
-print("After change:")
-print(Q)
-episode = gen_episode(env, Q)
-env.render_episode(episode)
+    #episode = gen_episode(env, Q)
+    #env.render_episode(episode)
 
-# plot statistics
-plotting.plot_episode_stats(stats)
+    '''
+    new_shape = (8, 8)
+    w = np.zeros(new_shape)
+    w[:,[3,4]] = 1
+    w[:,[6,7]] = 3
+
+    print("changing env")
+    env.change(new_shape, w, (5,5))
+    Q = q_learning(env, 500, 500, stats)
+    print("After change:")
+    print(Q)
+    episode = gen_episode(env, Q)
+    env.render_episode(episode)
+    '''
+    # plot statistics
+    plotting.plot_episode_stats(stats)
