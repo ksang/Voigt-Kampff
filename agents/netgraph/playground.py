@@ -10,3 +10,4 @@ test_paths = [
 for path in test_paths:
     print('Path:', path)
     print('Path RTL:', env.path_rtl(path))
+    print('Path RTL neighbors:', env.path_rtl_neighbors(path))

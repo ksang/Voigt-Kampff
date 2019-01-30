@@ -46,3 +46,18 @@ class NetGraphEnv(object):
             assert rtl is not None, link
             path_rtl += rtl
         return path_rtl
+
+    def path_rtl_neighbors(self, path):
+        """
+        Return the round-trip latency(RTL) for the path given and
+        neighbors of last hop in the path
+        path:   a list of tuple that contains src and dst node labels
+        """
+        node = path[-1][1]
+        neighbors = []
+        for l in self.links:
+            if l[0] == node:
+                neighbors += [l[1]]
+            if l[1] == node:
+                neighbors += [l[0]]
+        return self.path_rtl(path), neighbors
