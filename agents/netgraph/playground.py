@@ -8,6 +8,8 @@ test_paths = [
 ]
 
 for path in test_paths:
+    print('Gate:', env.hello())
+    print('Gate neighbor:', env.neighbors(env.hello()))
     print('Path:', path)
     print('Path RTL:', env.path_rtl(path))
     print('Path RTL neighbors:', env.path_rtl_neighbors(path))

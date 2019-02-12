@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 def parse_link(pair):
     if pair[0] < pair[1]:
@@ -11,9 +12,10 @@ class NetGraphEnv(object):
     The nodes in network have unique labels assigned to them。
     Network topology is an undirected cyclic graph.
     """
-    def __init__(self, nodes={}, links={}):
+    def __init__(self, nodes={}, links={}, gate=None):
         self.nodes = nodes
         self.links = links
+        self.gate = gate
 
     def fromfile(self, filename):
         with open(filename, 'r') as f:
@@ -21,8 +23,11 @@ class NetGraphEnv(object):
             topo = json.loads(data)
             self.nodes = topo["nodes"]
             self.links = topo["links"]
+            self.gate = topo.get("gate")
+            if self.gate is None:
+                self.gate = np.random.choice(list(self.nodes.keys()))
 
-    def fromlist(self, nodes, pairs):
+    def fromlist(self, nodes, pairs, gate=None):
         ns = {}
         for n in nodes:
             ns[n] = True
@@ -33,6 +38,28 @@ class NetGraphEnv(object):
             ls[link] = d[2]
         self.nodes = ns
         self.links = ls
+        self.gate = gate
+        if self.gate is None:
+            self.gate = np.random.choice(nodes)
+
+    def hello(self):
+        """
+        Return the link peer label id in the toplogy.
+        This is the start point of exploring the network.
+        """
+        return self.gate
+
+    def neighbors(self, node):
+        """
+        Return the neighbor label list of a node.
+        """
+        neighbors = []
+        for l in self.links:
+            if l[0] == node:
+                neighbors += [l[1]]
+            if l[1] == node:
+                neighbors += [l[0]]
+        return neighbors
 
     def path_rtl(self, path):
         """

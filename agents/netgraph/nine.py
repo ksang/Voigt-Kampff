@@ -1,3 +1,4 @@
+# Nine node topology for NetGraph envs
 import numpy as np
 import sys, os
 
@@ -21,7 +22,7 @@ Topology:
                      /                            |                            \
         +---------+ /                        +----|----+                        \ +---------+
         |         |/                         |         |                         \|         |
-  SRC   |   101   ----------------------------   102   ----------------------------   103   |  DST
+        |   101   ----------------------------   102   ----------------------------   103   |
         |         |\                         |         |                         /|         |
         +---------+ \                        +----|----+                        / +---------+
                      \                            |                            /
@@ -35,7 +36,7 @@ Topology:
                            +---------+       +---------+       +---------+
 """
 
-def nine_nodes_topo(rand_rtl=False):
+def nine_nodes_topo(rand_gate=False, rand_rtl=False):
     env = NetGraphEnv()
     nodes = []
     for i in range(1,10):
@@ -57,5 +58,8 @@ def nine_nodes_topo(rand_rtl=False):
     if rand_rtl:
         for d in l:
             d[2] = np.random.randint(1000)
-    env.fromlist(nodes, pairs)
+    if rand_gate:
+        env.fromlist(nodes, pairs)
+    else:
+        env.fromlist(nodes, pairs, 101)
     return env
