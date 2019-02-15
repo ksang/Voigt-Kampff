@@ -16,6 +16,7 @@ class NetGraphEnv(object):
         self.nodes = nodes
         self.links = links
         self.gate = gate
+        self.packet_count = 0
 
     def fromfile(self, filename):
         with open(filename, 'r') as f:
@@ -42,17 +43,22 @@ class NetGraphEnv(object):
         if self.gate is None:
             self.gate = np.random.choice(nodes)
 
+    def close(self):
+        print("env closed, packet count:", self.packet_count)
+
     def hello(self):
         """
         Return the link peer label id in the toplogy.
         This is the start point of exploring the network.
         """
+        self.packet_count += 1
         return self.gate
 
     def neighbors(self, node):
         """
         Return the neighbor label list of a node.
         """
+        self.packet_count += 1
         neighbors = []
         for l in self.links:
             if l[0] == node:
@@ -66,6 +72,7 @@ class NetGraphEnv(object):
         Return the round-trip latency(RTL) for the path given.
         path:   a list of tuple that contains src and dst node labels
         """
+        self.packet_count += 1
         path_rtl = 0
         for pair in path:
             link = parse_link(pair)
@@ -80,6 +87,7 @@ class NetGraphEnv(object):
         neighbors of last hop in the path
         path:   a list of tuple that contains src and dst node labels
         """
+        self.packet_count += 1
         node = path[-1][1]
         neighbors = []
         for l in self.links:
