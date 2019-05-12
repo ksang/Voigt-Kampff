@@ -12,7 +12,7 @@ from envs.tetris import GameGUI
 
 
 cmd_parser = argparse.ArgumentParser(description=None)
-# Data arguments
+# Arguments
 cmd_parser.add_argument('-g', '--gui', default=False, action='store_true',
                         help='Enable GUI display.')
 cmd_parser.add_argument('-i', '--interval', default=100, type=int,
@@ -55,9 +55,11 @@ if __name__ == '__main__':
         g.close()
     else:
         env = Game()
+        env.reset()
         for t in range(args.num):
             score, done = one_step(env, 0, args.verbose)
             if done:
+                print("Game over.")
                 break
 
     print("Score: %d, Steps: %d, Done: %s" % (score, t+1, done))
