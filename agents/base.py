@@ -1,6 +1,6 @@
 class BaseAgent(object):
     """
-    BaseAgent is the base class abstactions, all other agent implementations
+    BaseAgent is the base class abstractions, all other agent implementations
     are based on this interface.
     Agent is an actor that decoupled from environment, which means this interface
     only implements agent internal flows, interactions with environment should be
@@ -26,7 +26,7 @@ class BaseAgent(object):
         Args:
             state:      observation from environment.
         Returns:
-            actions:    a distribution of actions probablity.
+            actions:    a distribution of actions probabilities.
             value:      value of the state.
         """
         raise NotImplementedError
@@ -42,7 +42,7 @@ class BaseAgent(object):
         """
         raise NotImplementedError
 
-    def uodate(self, experience):
+    def update(self, experience):
         """
         Update agent by given experience
 
