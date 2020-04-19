@@ -1,7 +1,7 @@
 import gym
 import argparse
 import agents
-from envs import Tetris
+from envs.tetris import Tetris
 
 cmd_parser = argparse.ArgumentParser(description=None)
 cmd_parser.add_argument('-t', '--horizon', default=500,
@@ -16,7 +16,7 @@ def run(env, agent):
     i = 0
     render(env, i)
     while True:
-        (_, _), _, done  = env.step(agent.sample_action())
+        (_, _), _, done  = env.step(agent.take_action(None))
         if done:
             break
         i += 1

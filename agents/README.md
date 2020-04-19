@@ -20,8 +20,7 @@ class BaseAgent(object):
         Args:
             env:        gym environment agent is interacting, this is mainly for
                         gathering information, e.g. observation and action space size.
-            config:     configurations of the agent, e.g. learning rate, details see
-                        BaseConfig class.
+            config:     configurations of the agent, agent type specific.
         """
 
     def actions_value(self, state):
@@ -35,9 +34,9 @@ class BaseAgent(object):
             value:      value of the state.
         """
 
-    def sample_action(self, state):
+    def take_action(self, state):
         """
-        Sample one action according agent's behavior policy of given observation.
+        Take one action according agent's behavior policy of given observation.
 
         Args:
             state:      observation from environment.

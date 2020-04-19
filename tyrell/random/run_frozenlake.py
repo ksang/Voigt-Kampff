@@ -15,7 +15,7 @@ def run(env, agent, horizon):
     i = 0
     render(env, i)
     for i in range(horizon):
-        _, _, done, _ = env.step(agent.sample_action())
+        _, _, done, _ = env.step(agent.take_action(None))
         if done:
             break
         i += 1

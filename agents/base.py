@@ -13,10 +13,11 @@ class BaseAgent(object):
         Args:
             env:        gym environment agent is interacting, this is mainly for
                         gathering information, e.g. observation and action space size.
-            config:     configurations of the agent, e.g. learning rate, details see
-                        BaseConfig class.
+            config:     configurations of the agent, agent type specific.
         """
         self.env = env
+        self.observation_space = env.observation_space
+        self.action_space = env.action_space
         self.config = config
 
     def actions_value(self, state):
@@ -31,9 +32,9 @@ class BaseAgent(object):
         """
         raise NotImplementedError
 
-    def sample_action(self, state):
+    def take_action(self, state):
         """
-        Sample one action according agent's behavior policy of given observation.
+        Take one action according agent's behavior policy of given observation.
 
         Args:
             state:      observation from environment.
@@ -48,6 +49,6 @@ class BaseAgent(object):
 
         Args:
             experience: trajectory experiences recorded to update agent, e.g.
-                        [(s_0, a_0, r_0), ..., (s_t, a_t, r_t)]
+                        [(s_0, a_0, r_0, s_1, done), ..., (s_t, a_t, r_t, s_{t+1}, done)]
         """
         raise NotImplementedError
