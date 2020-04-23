@@ -9,3 +9,4 @@ class Config(object):
         self.replay_buffer_size = 1000
         self.batch_size = 32
         self.model_arch = 'linear'
+        self.gamma = 0.99

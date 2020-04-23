@@ -4,11 +4,15 @@ from agents import BaseAgent
 
 import math
 import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.autograd as autograd
 import torch.nn.functional as F
+
+USE_CUDA = torch.cuda.is_available()
+Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
 
 class LinearDQN(nn.Module):
 
@@ -48,7 +52,7 @@ class DQNAgent(BaseAgent):
         self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size)
 
     def compute_td_loss(self):
-        state, action, reward, next_state, done = self.replay_buffer.sample(self.batch_size)
+        state, action, reward, next_state, done = self.replay_buffer.sample(self.config.batch_size)
 
         state      = Variable(torch.FloatTensor(np.float32(state)))
         next_state = Variable(torch.FloatTensor(np.float32(next_state)), volatile=True)
@@ -61,7 +65,7 @@ class DQNAgent(BaseAgent):
 
         q_value          = q_values.gather(1, action.unsqueeze(1)).squeeze(1)
         next_q_value     = next_q_values.max(1)[0]
-        expected_q_value = reward + gamma * next_q_value * (1 - done)
+        expected_q_value = reward + self.config.gamma * next_q_value * (1 - done)
 
         loss = (q_value - Variable(expected_q_value.data)).pow(2).mean()
 
@@ -89,6 +93,8 @@ class DQNAgent(BaseAgent):
         return self.act(state, self.frame_idx)
 
     def update(self, experience):
-        self.replay_buffer.push(experience[0], experience[1], experience[2], experience[3], experience[4])
+        # experience: (state, next_state, action, reward, done)
+        state, next_state, action, reward, done = experience
+        self.replay_buffer.push(state, action, reward, next_state, done)
         if len(self.replay_buffer) > self.config.batch_size:
             self.compute_td_loss()
