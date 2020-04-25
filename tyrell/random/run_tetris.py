@@ -16,7 +16,7 @@ def run(env, agent):
     i = 0
     render(env, i)
     while True:
-        (_, _), _, done  = env.step(agent.take_action(None))
+        _, _, done  = env.step(agent.take_action(None))
         if done:
             break
         i += 1
