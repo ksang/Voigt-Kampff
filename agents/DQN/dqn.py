@@ -34,6 +34,37 @@ class LinearDQN(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
+class CnnDQN(nn.Module):
+    def __init__(self, input_shape, num_actions):
+        super(CnnDQN, self).__init__()
+
+        self.input_shape = input_shape
+        self.num_actions = num_actions
+
+        self.features = nn.Sequential(
+            nn.Conv2d(input_shape[0], 32, kernel_size=5, stride=2),
+            nn.LeakyReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2),
+            nn.LeakyReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.LeakyReLU()
+        )
+
+        self.fc = nn.Sequential(
+            nn.Linear(self.feature_size(), 512),
+            nn.ReLU(),
+            nn.Linear(512, self.num_actions)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+    def feature_size(self):
+        return self.features(autograd.Variable(torch.zeros(1, *self.input_shape))).view(1, -1).size(1)
+
 class DQNAgent(BaseAgent):
 
     def __init__(self, env, config=Config()):
@@ -41,6 +72,8 @@ class DQNAgent(BaseAgent):
         self.frame_idx = 0
         if config.model_arch == 'linear':
             self.model = LinearDQN(self.observation_space.shape[0], self.config.hidden_dim, self.action_space.n)
+        elif config.model_arch == 'cnn':
+            self.model = CnnDQN(self.observation_space.shape, self.action_space.n)
         else:
             print("Unknown model:", config.model)
             sys.exit(1)
@@ -48,8 +81,9 @@ class DQNAgent(BaseAgent):
         if config.use_cuda:
             self.model = self.model.cuda()
 
-        self.optimizer = optim.Adam(self.model.parameters())
+        self.optimizer = optim.Adam(self.model.parameters(), lr=1e-4)
         self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size)
+        self.losses = []
 
     def compute_td_loss(self):
         state, action, reward, next_state, done = self.replay_buffer.sample(self.config.batch_size)
@@ -72,6 +106,7 @@ class DQNAgent(BaseAgent):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        self.losses.append(loss.item())
 
         return loss
 
