@@ -110,6 +110,12 @@ class DQNAgent(BaseAgent):
 
         return loss
 
+    def normalize(self, state):
+        if self.config.normalize:
+            state_max, state_min = np.max(state), np.min(state)
+            state = 255.0 * (state - state_min) / (state_max - state_min)
+        return state
+
     def act(self, state, epsilon):
         if random.random() > epsilon:
             state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)

@@ -41,4 +41,4 @@ if __name__ == '__main__':
     elif args.model == 'cnn':
         env = Tetris(horizon=args.horizon, flattened_observation=True)
     agent = agents.DQN.DQNAgent(env)
-    train(env, agent, args.num_frames)
+    train(env, agent, int(args.num_frames))

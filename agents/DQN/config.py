@@ -10,3 +10,4 @@ class Config(object):
         self.batch_size = 32
         self.model_arch = 'linear'
         self.gamma = 0.99
+        self.normalize = True
