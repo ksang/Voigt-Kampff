@@ -1,69 +1,16 @@
 from agents.DQN import ReplayBuffer
 from agents.DQN import Config
 from agents import BaseAgent
+from agents.common import Linear
+from agents.common import CNN
 
 import math
 import random
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
 import torch.autograd as autograd
 import torch.nn.functional as F
-
-USE_CUDA = torch.cuda.is_available()
-Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
-
-class LinearDQN(nn.Module):
-
-    def __init__(self, input_dim, hidden_dim, output_dim):
-        super(LinearDQN, self).__init__()
-
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
-
-        self.layers = nn.Sequential(
-            nn.Linear(self.input_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.output_dim)
-        )
-
-    def forward(self, x):
-        return self.layers(x)
-
-class CnnDQN(nn.Module):
-    def __init__(self, input_shape, num_actions):
-        super(CnnDQN, self).__init__()
-
-        self.input_shape = input_shape
-        self.num_actions = num_actions
-
-        self.features = nn.Sequential(
-            nn.Conv2d(input_shape[0], 32, kernel_size=5, stride=2),
-            nn.LeakyReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=2),
-            nn.LeakyReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.LeakyReLU()
-        )
-
-        self.fc = nn.Sequential(
-            nn.Linear(self.feature_size(), 512),
-            nn.ReLU(),
-            nn.Linear(512, self.num_actions)
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
-        return x
-
-    def feature_size(self):
-        return self.features(autograd.Variable(torch.zeros(1, *self.input_shape))).view(1, -1).size(1)
 
 class DQNAgent(BaseAgent):
 
@@ -71,15 +18,18 @@ class DQNAgent(BaseAgent):
         super().__init__(env, config)
         self.frame_idx = 0
         if config.model_arch == 'linear':
-            self.model = LinearDQN(self.observation_space.shape[0], self.config.hidden_dim, self.action_space.n)
+            self.model = Linear(self.observation_space.shape[0], self.config.hidden_dim, self.action_space.n)
         elif config.model_arch == 'cnn':
-            self.model = CnnDQN(self.observation_space.shape, self.action_space.n)
+            self.model = CNN(self.observation_space.shape, self.action_space.n)
         else:
             print("Unknown model:", config.model)
             sys.exit(1)
 
-        if config.use_cuda:
+        if config.use_cuda and torch.cuda.is_available():
             self.model = self.model.cuda()
+            self.Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda()
+        else:
+            self.Variable = autograd.Variable
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-4)
         self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size)
@@ -88,11 +38,12 @@ class DQNAgent(BaseAgent):
     def compute_td_loss(self):
         state, action, reward, next_state, done = self.replay_buffer.sample(self.config.batch_size)
 
-        state      = Variable(torch.FloatTensor(np.float32(state)))
-        next_state = Variable(torch.FloatTensor(np.float32(next_state)), volatile=True)
-        action     = Variable(torch.LongTensor(action))
-        reward     = Variable(torch.FloatTensor(reward))
-        done       = Variable(torch.FloatTensor(done))
+        state      = self.Variable(torch.FloatTensor(np.float32(state)))
+        with torch.no_grad():
+            next_state = self.Variable(torch.FloatTensor(np.float32(next_state)))
+        action     = self.Variable(torch.LongTensor(action))
+        reward     = self.Variable(torch.FloatTensor(reward))
+        done       = self.Variable(torch.FloatTensor(done))
 
         q_values      = self.model(state)
         next_q_values = self.model(next_state)
@@ -101,7 +52,7 @@ class DQNAgent(BaseAgent):
         next_q_value     = next_q_values.max(1)[0]
         expected_q_value = reward + self.config.gamma * next_q_value * (1 - done)
 
-        loss = (q_value - Variable(expected_q_value.data)).pow(2).mean()
+        loss = (q_value - self.Variable(expected_q_value.data)).pow(2).mean()
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -118,7 +69,7 @@ class DQNAgent(BaseAgent):
 
     def act(self, state, epsilon):
         if random.random() > epsilon:
-            state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
+            state   = self.Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
             q_value = self.model.forward(state)
             action  = q_value.max(1)[1].data[0]
         else:
