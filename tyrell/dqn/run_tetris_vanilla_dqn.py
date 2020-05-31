@@ -9,7 +9,7 @@ cmd_parser.add_argument('-t', '--horizon', default=500,
                         help='Maximum time steps')
 cmd_parser.add_argument('-m', '--model', choices=['cnn','linear'], default='linear',
                         help='Model used for DQN')
-cmd_parser.add_argument('-n', '--num-frames', default=10000,
+cmd_parser.add_argument('-n', '--num-frames', default=500000,
                         help='Number of frames for training')
 
 def render(env, t, n):
@@ -30,7 +30,7 @@ def train(env, agent, num_frames):
             state = env.reset()
             episode_reward = 0
             continue
-        if frame_idx % 10000 == 0:
+        if frame_idx % 100000 == 0:
             plot_reward_loss(frame_idx, rewards, agent.losses)
         state = next_state
 

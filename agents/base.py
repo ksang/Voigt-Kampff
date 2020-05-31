@@ -43,12 +43,12 @@ class BaseAgent(object):
         """
         raise NotImplementedError
 
-    def update(self, experience):
+    def update(self, data):
         """
-        Update agent by given experience
+        Update agent by given data
 
         Args:
-            experience: trajectory experiences recorded to update agent, e.g.
+            data: depends on algorithum, for example trajectory experiences recorded to update agent
                         [(s_0, a_0, r_0, s_1, done), ..., (s_t, a_t, r_t, s_{t+1}, done)]
         """
         raise NotImplementedError
