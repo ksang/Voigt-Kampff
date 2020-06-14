@@ -36,9 +36,13 @@ def train(env, agent, num_frames):
 
 if __name__ == '__main__':
     args = cmd_parser.parse_args()
+    config = agents.DQN.Config()
+    config.model_arch = args.model
+
     if args.model == 'linear':
         env = Tetris(horizon=args.horizon, flattened_observation=True)
     elif args.model == 'cnn':
-        env = Tetris(horizon=args.horizon, flattened_observation=True)
-    agent = agents.DQN.DQNAgent(env)
+        env = Tetris(horizon=args.horizon)
+
+    agent = agents.DQN.DQNAgent(env, config)
     train(env, agent, int(args.num_frames))

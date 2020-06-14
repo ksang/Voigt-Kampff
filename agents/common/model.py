@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.autograd as autograd
 
@@ -29,18 +30,18 @@ class CNN(nn.Module):
         self.num_actions = num_actions
 
         self.features = nn.Sequential(
-            nn.Conv2d(input_shape[0], 32, kernel_size=5, stride=2),
+            nn.Conv2d(input_shape[0], 32, kernel_size=5, stride=1),
             nn.LeakyReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1),
             nn.LeakyReLU(),
             nn.Conv2d(64, 64, kernel_size=3, stride=1),
             nn.LeakyReLU()
         )
 
         self.fc = nn.Sequential(
-            nn.Linear(self.feature_size(), 512),
+            nn.Linear(self.feature_size(), 256),
             nn.ReLU(),
-            nn.Linear(512, self.num_actions)
+            nn.Linear(256, self.num_actions)
         )
 
     def forward(self, x):

@@ -20,7 +20,7 @@ class DQNAgent(BaseAgent):
         if config.model_arch == 'linear':
             self.model = Linear(self.observation_space.shape[0], self.config.hidden_dim, self.action_space.n)
         elif config.model_arch == 'cnn':
-            self.model = CNN(self.observation_space.shape, self.action_space.n)
+            self.model = CNN((1, self.observation_space.shape[0], self.observation_space.shape[1]), self.action_space.n)
         else:
             print("Unknown model:", config.model)
             sys.exit(1)
