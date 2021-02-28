@@ -108,3 +108,4 @@ venv.bak/
 .DS_Store
 .ipynb_checkpoints
 experiments
+.vscode

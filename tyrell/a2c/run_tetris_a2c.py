@@ -1,6 +1,7 @@
 import gym
 import argparse
 import agents
+import torch
 from envs.tetris import Tetris
 from utils.plots import plot_reward_loss
 
@@ -9,7 +10,7 @@ cmd_parser.add_argument('-t', '--horizon', default=500,
                         help='Maximum time steps')
 cmd_parser.add_argument('-n', '--num-frames', default=50000,
                         help='Number of frames for training')
-cmd_parser.add_argument('-cuda', '--enable-cuda', default=True, action='store_true'
+cmd_parser.add_argument('-cuda', '--enable-cuda', default=True, action='store_true',
                         help='Enable CUDA if available')
 
 def train(env, agent, num_frames, device):

@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.distributions import Categorical
 
@@ -44,7 +45,7 @@ class A2CAgent(BaseAgent):
         self.losses = []
         self.model = ActorCritic(env.observation_space.shape[0],
                                  env.action_space.n,
-                                 config.hidden_dim
+                                 config.hidden_dim,
                                  config.std)
         if config.use_cuda and torch.cuda.is_available():
             self.model = self.model.cuda()
@@ -56,7 +57,7 @@ class A2CAgent(BaseAgent):
 
         self.optimizer = optim.Adam(self.model.parameters())
 
-    def compute_returns(next_value, rewards, masks, gamma=0.99):
+    def compute_returns(self, next_value, rewards, masks, gamma=0.99):
         R = next_value
         returns = []
         for step in reversed(range(len(rewards))):
@@ -97,4 +98,4 @@ class A2CAgent(BaseAgent):
 
         self.optimizer.zero_grad()
         loss.backward()
-        optimizer.step()
+        self.optimizer.step()
