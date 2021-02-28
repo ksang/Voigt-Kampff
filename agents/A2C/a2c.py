@@ -41,6 +41,7 @@ class A2CAgent(BaseAgent):
     def __init__(self, env, config=Config()):
         super().__init__(env, config)
         self.frame_idx = 0
+        self.losses = []
         self.model = ActorCritic(env.observation_space.shape[0],
                                  env.action_space.n,
                                  config.hidden_dim
@@ -69,12 +70,15 @@ class A2CAgent(BaseAgent):
         dist, value = self.model(state)
         return dist.sample()
 
+    def actions_value(self, state):
+        return self.model(state)
+
     def update(self, data):
         '''
         For a fixed number of steps, perform update to the model.
-        data = (next_state, log_probs, rewards, masks)
+        data = (next_state, log_probs, rewards, masks, values, entropy)
         '''
-        (next_state, log_probs, rewards, masks) = data
+        (next_state, log_probs, rewards, masks, values, entropy) = data
         next_state = torch.FloatTensor(next_state).to(self.device)
         _, next_value = self.model(next_state)
         returns = self.compute_returns(next_value, rewards, masks)
@@ -89,6 +93,7 @@ class A2CAgent(BaseAgent):
         critic_loss = advantage.pow(2).mean()
 
         loss = actor_loss + 0.5 * critic_loss - 0.001 * entropy
+        self.losses += [loss]
 
         self.optimizer.zero_grad()
         loss.backward()
