@@ -4,6 +4,13 @@
 
 This work aims to build a modern Tetris game that can interact with Reinforcement Learning agents. It can be also played by human and supports features such as **hard** **drop**, **hold** **queue** and **T-spin**.
 
+To get this env, pull git submodule:
+```
+git submodule update --init --recursive
+```
+
+
+
 ### States
 
 Two np array:
@@ -22,8 +29,9 @@ Discrete, 8 actions:
 - 6 : rotate clockwise
 - 7 : hold/dequeue
 ### Agent play with Gym RL environment
-
-    import tetris
-    env = tetris.Tetris()
-    (initial_board, initial_next_queue) = env.reset()
-    (board, next_queue), score, done = env.step(env.action_space.sample())
+```
+import tetris
+env = tetris.Tetris()
+(initial_board, initial_next_queue) = env.reset()
+(board, next_queue), score, done = env.step(env.action_space.sample())
+```

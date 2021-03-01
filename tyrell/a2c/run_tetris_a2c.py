@@ -10,7 +10,7 @@ cmd_parser.add_argument('-t', '--horizon', default=500,
                         help='Maximum time steps')
 cmd_parser.add_argument('-n', '--num-frames', default=50000,
                         help='Number of frames for training')
-cmd_parser.add_argument('-cuda', '--enable-cuda', default=True, action='store_true',
+cmd_parser.add_argument('-cuda', '--enable-cuda', default=False, action='store_true',
                         help='Enable CUDA if available')
 
 def train(env, agent, num_frames, device):
@@ -31,17 +31,18 @@ def train(env, agent, num_frames, device):
         log_prob = dist.log_prob(action)
         entropy += dist.entropy().mean()
 
-        log_probs.append(log_prob)
+        log_probs.append(log_prob.unsqueeze(0).to(device))
         values.append(value)
-        rewards.append(torch.FloatTensor(reward).unsqueeze(1).to(device))
-        masks.append(torch.FloatTensor(1 - done).unsqueeze(1).to(device))
+        rewards.append(torch.FloatTensor([reward]).unsqueeze(1).to(device))
+        masks.append(torch.FloatTensor([1 - done]).unsqueeze(1).to(device))
 
         episode_reward += reward
 
         if done:
+            print("episode done, updating")
             agent.update((next_state, log_probs, rewards, masks, values, entropy))
             total_rewards.append(episode_reward)
-
+            print("update done, reseting")
             state = env.reset()
             episode_reward = 0
             log_probs = []

@@ -1,6 +1,7 @@
 from agents.A2C import Config
 from agents import BaseAgent
 
+import sys
 import math
 import random
 
@@ -28,7 +29,7 @@ class ActorCritic(nn.Module):
             nn.Linear(num_inputs, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, num_outputs),
-            nn.Softmax(dim=1),
+            nn.Softmax(dim=0),
         )
 
     def forward(self, x):
@@ -72,6 +73,7 @@ class A2CAgent(BaseAgent):
         return dist.sample()
 
     def actions_value(self, state):
+        state = torch.FloatTensor(state).to(self.device)
         return self.model(state)
 
     def update(self, data):
@@ -84,14 +86,14 @@ class A2CAgent(BaseAgent):
         _, next_value = self.model(next_state)
         returns = self.compute_returns(next_value, rewards, masks)
 
-        log_probs = torch.cat(log_probs)
+        log_probs = torch.cat(log_probs).detach()
         returns   = torch.cat(returns).detach()
-        values    = torch.cat(values)
+        values    = torch.cat(values).detach()
 
         advantage = returns - values
 
         actor_loss  = -(log_probs * advantage.detach()).mean()
-        critic_loss = advantage.pow(2).mean()
+        critic_loss = advantage.detach().pow(2).mean()
 
         loss = actor_loss + 0.5 * critic_loss - 0.001 * entropy
         self.losses += [loss]
@@ -99,3 +101,16 @@ class A2CAgent(BaseAgent):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+
+def getBack(var_grad_fn):
+    print(var_grad_fn)
+    for n in var_grad_fn.next_functions:
+        if n[0]:
+            try:
+                tensor = getattr(n[0], 'variable')
+                print(n[0])
+                print('Tensor with grad found:', tensor)
+                print(' - gradient:', tensor.grad)
+                print()
+            except AttributeError as e:
+                getBack(n[0])
