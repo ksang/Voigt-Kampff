@@ -39,10 +39,9 @@ def train(env, agent, num_frames, device):
         episode_reward += reward
 
         if done:
-            print("episode done, updating")
             agent.update((next_state, log_probs, rewards, masks, values, entropy))
             total_rewards.append(episode_reward)
-            print("update done, reseting")
+
             state = env.reset()
             episode_reward = 0
             log_probs = []
