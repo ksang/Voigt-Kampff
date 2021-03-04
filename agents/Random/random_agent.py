@@ -1,7 +1,7 @@
 from agents import BaseAgent
 
-class RandomAgent(BaseAgent):
 
+class RandomAgent(BaseAgent):
     def __init__(self, env, config):
         super().__init__(env, config)
 

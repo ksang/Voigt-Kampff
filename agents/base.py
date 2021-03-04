@@ -6,6 +6,7 @@ class BaseAgent(object):
     only implements agent internal flows, interactions with environment should be
     implemented outside of this.
     """
+
     def __init__(self, env=None, config=None):
         """
         Agent initialization.
