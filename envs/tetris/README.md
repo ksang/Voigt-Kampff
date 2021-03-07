@@ -9,8 +9,6 @@ To get this env, pull git submodule:
 git submodule update --init --recursive
 ```
 
-
-
 ### States
 
 Two np array:
