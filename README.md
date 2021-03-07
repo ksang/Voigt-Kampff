@@ -16,7 +16,7 @@ Project name **Voigt-Kampff** originating in **Philip K. Dick**'s cyberpunk nove
 
 - [Random](agents/Random)
 - [DQN](agents/DQN)
-
+- [A2C](agents/A2C)
 
 ### Run
 
@@ -24,3 +24,24 @@ Project name **Voigt-Kampff** originating in **Philip K. Dick**'s cyberpunk nove
 
 - This project's Python environment is based on [direnv](https://direnv.net/), follow the instructions to install and hook into bash.
 - [Pytorch](https://pytorch.org/) is used as deep learning framework.
+- Get all git submodules by command:
+    ```
+    git submodule update --init --recursive
+    ```
+
+#### Run scripts
+
+- The run scripts are located in [tyrell](tyrell) folder. For example, below command will train an A2C agent with tetris environment:
+    ```
+    python3 tyrell/a2c/run_tetris_a2c.py
+    ```
+
+### Development
+
+#### pre-commit hooks
+
+- Install pre-commit: [docs](https://pre-commit.com/#installation)
+- Install git hooks:
+    ```
+    pre-commit install
+    ```

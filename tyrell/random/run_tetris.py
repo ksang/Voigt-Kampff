@@ -4,25 +4,27 @@ import agents
 from envs.tetris import Tetris
 
 cmd_parser = argparse.ArgumentParser(description=None)
-cmd_parser.add_argument('-t', '--horizon', default=500,
-                        help='Maximum time steps')
+cmd_parser.add_argument("-t", "--horizon", default=500, help="Maximum time steps")
+
 
 def render(env, t):
     print("Step:", t)
     env.render()
+
 
 def run(env, agent):
     env.reset()
     i = 0
     render(env, i)
     while True:
-        _, _, done  = env.step(agent.take_action(None))
+        _, _, done = env.step(agent.take_action(None))
         if done:
             break
         i += 1
     render(env, i)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     args = cmd_parser.parse_args()
     env = Tetris(horizon=args.horizon)
     agent = agents.Random.RandomAgent(env, None)
